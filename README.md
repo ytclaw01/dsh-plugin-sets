@@ -8,6 +8,8 @@ A DSH plugin that saves the official Plugins page state as named **scenes** — 
 - 入口 / entry: 设置 → **DSH场景设置**（`Settings → DSH scene settings`）
 - 需要 / requires: DSH 桌面版或 Web 版（`dsh.bundle` + `dsh.client`），在 `@deepseek-ai/dsh-desktop-runtime` 0.2.2-rc.3 上验证
 
+![DSH场景设置简介](assets/share-intro.png)
+
 ---
 
 ## 中文
