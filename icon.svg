@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="plugin scenes">
+  <path
+    d="M16 14h26v11.5a7.5 7.5 0 0 0 15 0V14h23v26H68.5a7.5 7.5 0 0 0 0 15H80v27H53.5V70.5a7.5 7.5 0 0 0-15 0V82H16V55h11.5a7.5 7.5 0 0 0 0-15H16z"
+    fill="#4d6bfe"
+    fill-opacity="0.16"
+    stroke="#4d6bfe"
+    stroke-width="5"
+    stroke-linejoin="round"
+  />
+  <path d="M28 26h10v14H28z" fill="#4d6bfe" fill-opacity="0.35" />
+  <path d="M56 56h12v12H56z" fill="#4d6bfe" fill-opacity="0.35" />
+</svg>

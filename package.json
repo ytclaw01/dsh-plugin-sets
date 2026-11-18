@@ -1,0 +1,50 @@
+{
+  "name": "dsh-plugin-sets",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Save named scenes of DSH plugins, MCP servers and skills, and switch between them in one click.",
+  "license": "MIT",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "plugin-manager",
+    "mcp",
+    "skills",
+    "profiles"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ytclaw01/dsh-plugin-sets.git"
+  },
+  "homepage": "https://github.com/ytclaw01/dsh-plugin-sets#readme",
+  "bugs": {
+    "url": "https://github.com/ytclaw01/dsh-plugin-sets/issues"
+  },
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  }
+}
