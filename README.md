@@ -83,6 +83,7 @@ A DSH plugin that saves the official Plugins page state as named **scenes** — 
 - `index.js` — host 半：路由、场景存储、差量应用、技能影子 provider、会话运行检测
 - `client.js` — client 半：设置页与输入框 chip（纯 React，不依赖 DSH 的客户端包）
 - `cordis.patch.yml` — 让 DSH 装上它的 loader patch
+- `CHANGELOG.md` — 各版本的新增 / 修复 / 限制
 
 ---
 
@@ -143,6 +144,7 @@ Issues and pull requests are welcome. Layout:
 - `index.js` — host half: routes, scene store, diff apply, skill shadow provider, running-session guard
 - `client.js` — client half: settings page and composer chip (plain React, no DSH client packages)
 - `cordis.patch.yml` — loader patch that installs it
+- `CHANGELOG.md` — what changed in each version
 
 ---
 
