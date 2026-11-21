@@ -27,6 +27,26 @@ const API_PREFIX = '/api/plugin-sets'
 const BODY_LIMIT = 256 * 1024
 const STATE_VERSION = 3
 const SHADOW_PROVIDER = 'dsh-plugin-sets-shadow'
+/** Provider that serves the skills copied into this plugin's own folder. */
+const SCENE_PROVIDER = 'dsh-plugin-sets-scene'
+/** Display prefix for an adopted skill. Skill IDs themselves must stay ASCII. */
+const SCENE_PREFIX = '场景-'
+/** The skill registry only accepts kebab-case IDs, so scenario skills use `scene-<name>`. */
+const SCENE_ID_PREFIX = 'scene-'
+/**
+ * The registry validates every candidate and THROWS on a bad one, which takes
+ * the whole global catalog down — so every name we emit is normalized here and
+ * anything that still fails is dropped instead of being handed over.
+ */
+const SKILL_NAME_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+/**
+ * Skills this plugin ships itself. They live in the managed folder so the same
+ * provider serves them, but they are not "adopted" user folders: the page hides
+ * their remove button and the scanner never offers them for adoption.
+ */
+
+/** Adoption rank: below the runtime layer (250), above bundled skills (600). */
+const SCENE_RANK = 400
 /** Loader rows of this module are the MCP servers this profile runs. */
 const MCP_CLIENT = '@deepseek-ai/dsh-mcp-client'
 /** Below every packaged provider (600), the runtime rank (250) and the
@@ -57,24 +77,55 @@ export function apply(ctx) {
   const dispose = webServer.register({ kind: 'prefix', path: API_PREFIX, handler: handle })
   ctx.effect(() => dispose, 'plugin-sets:routes')
 
-  // Shadows are registered synchronously for the global layer and for every live
-  // agent, so a disabled skill is masked in the preset layers too.
-  const registerShadow = (owner) => {
+  // Providers are registered synchronously for the global layer and for every
+  // live agent, so a disabled skill is masked in the preset layers too and an
+  // adopted skill is visible everywhere.
+  const registerProviders = (owner) => {
     const skills = owner && typeof owner.get === 'function' ? owner.get('skills') : null
     if (!skills || typeof skills.registerProvider !== 'function') return () => {}
+    const offs = []
+    const sceneDir = path.join(homeDir(ctx), OWN_BUNDLE, 'skills')
     try {
       const off = skills.registerProvider(createShadowProvider(store, skillControls))
-      if (typeof off === 'function') skillDisposers.add(off)
-      return typeof off === 'function' ? off : () => {}
+      if (typeof off === 'function') { skillDisposers.add(off); offs.push(off) }
     } catch (error) {
       ctx.logger?.warn?.(`[plugin-sets] cannot register shadow provider: ${error?.message ?? error}`)
-      return () => {}
+    }
+    try {
+      const off = skills.registerProvider(createSceneProvider(sceneDir, skillControls))
+      if (typeof off === 'function') { skillDisposers.add(off); offs.push(off) }
+    } catch (error) {
+      ctx.logger?.warn?.(`[plugin-sets] cannot register scene provider: ${error?.message ?? error}`)
+    }
+    return () => {
+      for (const off of offs) {
+        skillDisposers.delete(off)
+        try {
+          off()
+        } catch {
+          /* already disposed */
+        }
+      }
     }
   }
-  registerShadow(ctx)
+  registerProviders(ctx)
+  const systemPrompt = ctx.get('systemPrompt')
+  if (systemPrompt && typeof systemPrompt.section === 'function') {
+    try {
+      const off = systemPrompt.section({
+        name: 'plugin-sets:notes',
+        order: 860,
+        text: () => activeNotesText,
+      })
+      if (typeof off === 'function') ctx.effect(() => off, 'plugin-sets:notes-section')
+    } catch (error) {
+      ctx.logger?.warn?.(`[plugin-sets] cannot register notes section: ${error?.message ?? error}`)
+    }
+  }
+  void refreshNotes(store)
   const registerAgentShadow = (agent) => {
     if (!agent || !agent.id || agentDisposers.has(agent.id)) return
-    agentDisposers.set(agent.id, registerShadow(agent.ctx))
+    agentDisposers.set(agent.id, registerProviders(agent.ctx))
   }
   const agentsRegistry = ctx.get('agents')
   if (agentsRegistry && typeof agentsRegistry.list === 'function') {
@@ -177,8 +228,38 @@ function createStore(ctx) {
   }
 }
 
-function emptyState() {
-  return { version: STATE_VERSION, scenes: [], active: null, lastApplied: null, skills: { disabled: [] } }
+/**
+ * Text injected into the system prompt for the ACTIVE scene's notes. Kept in a
+ * module-level cache so the prompt section can stay synchronous; every write
+ * that can change the active scene refreshes it.
+ */
+let activeNotesText = ''
+
+async function refreshNotes(store) {
+  let text = ''
+  try {
+    const state = await store.read()
+    const active = state.active
+    if (active && active.sceneId) {
+      const scene = state.scenes.find((item) => item.id === active.sceneId)
+      const ids = scene && Array.isArray(scene.notes) ? scene.notes : []
+      const lines = []
+      for (const id of ids) {
+        const note = state.notes.find((item) => item.id === id)
+        if (!note) continue
+        lines.push(`### ${note.name}\n${note.body.trim()}`)
+      }
+      if (lines.length > 0) {
+        text = `以下注明来自当前场景「${scene?.name || active.sceneName}」，是本轮任务的额外约束，优先遵守：\n\n${lines.join('\n\n')}`
+      }
+    }
+  } catch {
+    text = ''
+  }
+  activeNotesText = text
+}
+
+function emptyState() {  return { version: STATE_VERSION, scenes: [], combos: [], notes: [], active: null, lastApplied: null, skills: { disabled: [] }, local: [] }
 }
 
 function cleanDisabled(list) {
@@ -215,11 +296,42 @@ function normalize(raw) {
         : [],
       skills: cleanDisabled(scene.skills && scene.skills.disabled ? scene.skills.disabled : scene.skills),
       mcp: Array.isArray(scene.mcp) ? [...new Set(scene.mcp.filter((item) => typeof item === 'string' && item))] : null,
+      notes: Array.isArray(scene.notes) ? [...new Set(scene.notes.filter((item) => typeof item === 'string' && item))] : null,
+      comboId: typeof scene.comboId === 'string' ? scene.comboId : '',
       createdAt: typeof scene.createdAt === 'string' ? scene.createdAt : new Date().toISOString(),
       updatedAt: typeof scene.updatedAt === 'string' ? scene.updatedAt : new Date().toISOString(),
     })
   }
   state.skills = { disabled: cleanDisabled(raw.skills && raw.skills.disabled ? raw.skills.disabled : raw.skills) }
+  state.local = Array.isArray(raw.local)
+    ? [...new Set(raw.local.filter((item) => typeof item === 'string' && item && !item.includes('/') && !item.includes('\\')))]
+    : []
+  state.notes = []
+  for (const note of Array.isArray(raw.notes) ? raw.notes : []) {
+    if (!note || typeof note !== 'object') continue
+    const title = typeof note.name === 'string' ? note.name.trim() : ''
+    const body = typeof note.body === 'string' ? note.body : ''
+    if (!title && !body.trim()) continue
+    state.notes.push({
+      id: typeof note.id === 'string' && note.id ? note.id : newId(),
+      name: title || body.trim().slice(0, 24),
+      body,
+      createdAt: typeof note.createdAt === 'string' ? note.createdAt : new Date().toISOString(),
+      updatedAt: typeof note.updatedAt === 'string' ? note.updatedAt : new Date().toISOString(),
+    })
+  }
+  state.combos = []
+  for (const combo of Array.isArray(raw.combos) ? raw.combos : []) {    if (!combo || typeof combo !== 'object') continue
+    const comboName = typeof combo.name === 'string' ? combo.name.trim() : ''
+    if (!comboName) continue
+    state.combos.push({
+      id: typeof combo.id === 'string' && combo.id ? combo.id : newId(),
+      name: comboName,
+      skills: Array.isArray(combo.skills) ? [...new Set(combo.skills.filter((item) => typeof item === 'string' && item))] : [],
+      createdAt: typeof combo.createdAt === 'string' ? combo.createdAt : new Date().toISOString(),
+      updatedAt: typeof combo.updatedAt === 'string' ? combo.updatedAt : new Date().toISOString(),
+    })
+  }
   const active = raw.active
   if (active && typeof active === 'object' && active.baseline && typeof active.baseline === 'object') {
     state.active = {
@@ -262,7 +374,70 @@ function newId() {
   return `s${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`
 }
 
-/* ----------------------------------------------------------------- skills -- */
+/* ------------------------------------------------------- adopted skills -- */
+
+function managedSkillsDir(ctx) {
+  return path.join(homeDir(ctx), OWN_BUNDLE, 'skills')
+}
+
+async function pathExists(target) {
+  try {
+    await fs.stat(target)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** Copy a skill folder found by the scanner into the plugin's own skill dir. */
+async function adoptSkill(ctx, body, controls) {
+  const source = typeof body?.path === 'string' ? body.path : ''
+  if (!source) return { ok: false, error: { code: 'invalid-path', message: '缺少来源目录' } }
+  const resolved = path.resolve(source)
+  const allowed = skillRoots(ctx).some((root) => {
+    const base = path.resolve(root.path)
+    return resolved === base || resolved.startsWith(base + path.sep)
+  })
+  if (!allowed) return { ok: false, error: { code: 'invalid-path', message: '只能装载扫描到的技能目录' } }
+  const folder = path.basename(resolved)
+  const dir = managedSkillsDir(ctx)
+  const target = path.join(dir, folder)
+  if (await pathExists(target)) {
+    return { ok: false, error: { code: 'exists', message: `已经装过：${folder}` } }
+  }
+  try {
+    await fs.mkdir(dir, { recursive: true })
+    await fs.cp(resolved, target, { recursive: true })
+  } catch (error) {
+    return { ok: false, error: { code: 'copy-failed', message: `复制失败：${error?.message ?? error}` } }
+  }
+  const display = `${SCENE_PREFIX}${folder}`
+  const name = sceneSkillId(folder, folder)
+  invalidateSkills(controls)
+  return { ok: true, folder, name, display }
+}
+
+/** Move an adopted skill out of the plugin dir (kept under trash/, never deleted). */
+async function removeSceneSkill(ctx, body, controls) {
+  const folder = typeof body?.folder === 'string' ? body.folder : ''
+  if (!folder || folder === '.' || folder === '..' || folder.includes('/') || folder.includes('\\')) {
+    return { ok: false, error: { code: 'invalid-name', message: '技能目录名不合法' } }
+  }
+  const dir = managedSkillsDir(ctx)
+  const target = path.join(dir, folder)
+  if (!(await pathExists(target))) return { ok: false, error: { code: 'unknown-skill', message: '该技能不在场景技能目录' } }
+  const trash = path.join(homeDir(ctx), OWN_BUNDLE, 'trash')
+  try {
+    await fs.mkdir(trash, { recursive: true })
+    const moved = path.join(trash, `${folder}-${Date.now()}`)
+    await fs.rename(target, moved)
+    invalidateSkills(controls)
+    return { ok: true, folder, moved }
+  } catch (error) {
+    return { ok: false, error: { code: 'move-failed', message: `卸载失败：${error?.message ?? error}` } }
+  }
+}
+
 
 /**
  * A provider whose only job is to occupy the winning rank for a disabled name.
@@ -280,17 +455,28 @@ function createShadowProvider(store, controls) {
     return {
       name: SHADOW_PROVIDER,
       async list() {
-        const state = await store.read()
-        return state.skills.disabled.map((entry) => ({
-          name: entry.name,
-          description: entry.description || '已被「DSH场景设置」停用',
-          ...(entry.whenToUse ? { whenToUse: entry.whenToUse } : {}),
-          invocation: { modelInvocable: false, userInvocable: false },
-          source: entry.source || 'custom',
-          provider: SHADOW_PROVIDER,
-          rank: SHADOW_RANK,
-          locator: { name: entry.name },
-        }))
+        try {
+          const state = await store.read()
+          const out = []
+          for (const entry of state.skills.disabled) {
+            if (typeof entry?.name !== 'string' || !SKILL_NAME_RE.test(entry.name)) continue
+            out.push({
+              name: entry.name,
+              description: entry.description || '已被「DSH场景设置」停用',
+              ...(entry.whenToUse ? { whenToUse: entry.whenToUse } : {}),
+              invocation: { modelInvocable: false, userInvocable: false },
+              source: entry.source || 'custom',
+              provider: SHADOW_PROVIDER,
+              rank: SHADOW_RANK,
+              locator: { name: entry.name },
+              metadata: { origin: entry.provider || null, sceneDisplay: entry.display || null },
+            })
+          }
+          return out
+        } catch {
+          /* A provider that throws is skipped, but never risk a malformed candidate. */
+          return []
+        }
       },
       async get() {
         return undefined
@@ -299,12 +485,127 @@ function createShadowProvider(store, controls) {
   }
 }
 
+/** Kebab-case the raw text so `场景-grill-me` becomes the valid id `scene-grill-me`. */
+function kebabSkillName(raw) {
+  const lowered = String(raw || '').toLowerCase()
+  const ascii = lowered.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+  const kebab = ascii.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48)
+  return kebab || ''
+}
+
+/** The registry-safe ID of an adopted skill; the 场景- prefix stays display-only. */
+function sceneSkillId(folder, metaName) {
+  const base = kebabSkillName(metaName) || kebabSkillName(folder) || 'skill'
+  return `${SCENE_ID_PREFIX}${base}`
+}
+
 function invalidateSkills(controls) {
   for (const control of controls) {
     try {
       control.invalidate?.()
     } catch {
       /* provider already disposed */
+    }
+  }
+}
+
+/**
+ * Serves the skills the user copied into this plugin's own skill folder. DSH
+ * does not load arbitrary user folders, so adopting one here is what makes it
+ * real; every adopted skill is renamed with the 场景- prefix so it is obvious
+ * where it came from. The rank sits below the runtime layer but above the
+ * bundled one, and the shadow provider still wins a disabled name.
+ */
+function createSceneProvider(dir, controls) {
+  const readOne = async (folder) => {
+    const folderPath = path.join(dir, folder)
+    for (const candidate of ['SKILL.md', 'skill.md']) {
+      const file = path.join(folderPath, candidate)
+      let text = ''
+      try {
+        text = await fs.readFile(file, 'utf8')
+      } catch {
+        continue
+      }
+      const meta = (await readSkillMeta(file)) || { name: folder, description: '' }
+      const id = sceneSkillId(folder, meta.name)
+      if (!SKILL_NAME_RE.test(id)) return null
+      const heading = /^#\s+(.+)$/m.exec(text)
+      const description = (meta.description || '').trim()
+        || (heading ? heading[1].trim() : '')
+        || meta.name
+        || folder
+      return {
+        name: id,
+        displayName: `${SCENE_PREFIX}${meta.name || folder}`,
+        description,
+        folder,
+        file,
+        content: text,
+      }
+    }
+    return null
+  }
+  const listFolders = async () => {
+    try {
+      const entries = await fs.readdir(dir, { withFileTypes: true })
+      return entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name)
+    } catch {
+      return []
+    }
+  }
+  return (control) => {
+    controls.add(control)
+    try {
+      control.signal?.addEventListener?.('abort', () => controls.delete(control), { once: true })
+    } catch {
+      /* ignore */
+    }
+    return {
+      name: SCENE_PROVIDER,
+      async list() {
+        try {
+          const out = []
+          for (const folder of await listFolders()) {
+            const found = await readOne(folder)
+            if (!found) continue
+            out.push({
+              name: found.name,
+              description: found.description,
+              invocation: { modelInvocable: true, userInvocable: true },
+              source: 'custom',
+              provider: SCENE_PROVIDER,
+              rank: SCENE_RANK,
+              locator: { folder, file: found.file },
+              metadata: { origin: SCENE_PROVIDER, sceneDisplay: found.displayName },
+            })
+          }
+          return out
+        } catch {
+          return []
+        }
+      },
+      async get(candidate) {
+        try {
+          const folder = candidate?.locator?.folder
+          if (typeof folder !== 'string') return undefined
+          const found = await readOne(folder)
+          if (!found) return undefined
+          return {
+            name: found.name,
+            description: found.description,
+            invocation: { modelInvocable: true, userInvocable: true },
+            source: 'custom',
+            provider: SCENE_PROVIDER,
+            rank: SCENE_RANK,
+            path: found.file,
+            content: found.content,
+            metadata: { origin: SCENE_PROVIDER, sceneDisplay: found.displayName },
+          }
+        } catch {
+          return undefined
+        }
+      },
     }
   }
 }
@@ -325,6 +626,8 @@ async function captureDisabled(ctx, agents, names, previous) {
       description: found?.description || before?.description || '',
       whenToUse: found?.whenToUse || before?.whenToUse || null,
       source: found?.source || before?.source || 'custom',
+      provider: found?.origin || found?.provider || before?.provider || 'custom',
+      display: found?.display || before?.display || null,
     }
   })
 }
@@ -488,14 +791,21 @@ async function route(ctx, store, getPending, setPending, agents, controls, req, 
     if (action === 'debug/file') return send(res, 200, await debugFile(body))
     if (action === 'debug/ls') return send(res, 200, await debugLs(body))
     if (action === 'debug/graph') return send(res, 200, await debugGraph(ctx))
-    if (action === 'scene/save') return send(res, 200, await saveScene(ctx, store, body, agents))
-    if (action === 'scene/delete') return send(res, 200, await deleteScene(store, body))
+    if (action === 'scene/save') { const out = await saveScene(ctx, store, body, agents); await refreshNotes(store); return send(res, 200, out) }
+    if (action === 'scene/delete') { const out = await deleteScene(store, body); await refreshNotes(store); return send(res, 200, out) }
+    if (action === 'combo/save') return send(res, 200, await saveCombo(store, body))
+    if (action === 'combo/delete') return send(res, 200, await deleteCombo(store, body))
+    if (action === 'note/save') { const out = await saveNote(store, body); await refreshNotes(store); return send(res, 200, out) }
+    if (action === 'note/delete') { const out = await deleteNote(store, body); await refreshNotes(store); return send(res, 200, out) }
+    if (action === 'discover/scan') return send(res, 200, await discoverSkills(ctx, agents))
+    if (action === 'discover/adopt') return send(res, 200, await adoptSkill(ctx, body, controls))
+    if (action === 'discover/remove') return send(res, 200, await removeSceneSkill(ctx, body, controls))
     if (action === 'scene/apply-now') return send(res, 200, await applyNow(ctx, store, body, getPending, setPending, controls, lang, agents))
     if (action === 'apply/prepare') return send(res, 200, await prepareApply(ctx, store, body, setPending, lang, agents))
     if (action === 'apply/step') return send(res, 200, await stepApply(ctx, store, getPending, setPending, controls))
     if (action === 'apply/finish') return send(res, 200, await finishApply(ctx, store, getPending(), setPending, lang))
     if (action === 'apply/abort') return send(res, 200, await abortApply(ctx, store, getPending(), setPending))
-    if (action === 'undo') return send(res, 200, await undo(ctx, store, lang, controls, body))
+    if (action === 'undo') { const out = await undo(ctx, store, lang, controls, body); await refreshNotes(store); return send(res, 200, out) }
 
     return send(res, 404, { ok: false, error: { code: 'unknown-action', message: action } })
   } catch (error) {
@@ -678,6 +988,8 @@ async function debugSkills(ctx, agents) {
         whenToUse: skill.whenToUse ?? null,
         source: skill.source,
         provider: skill.provider,
+        origin: skill.metadata?.origin || skill.provider,
+        display: skill.metadata?.sceneDisplay || null,
         path: skill.path ?? null,
         modelInvocable: skill.invocation?.modelInvocable ?? null,
         userInvocable: skill.invocation?.userInvocable ?? null,
@@ -760,6 +1072,9 @@ async function statePayload(ctx, store, pending, lang, agents) {
     ok: true,
     statePath: store.path,
     scenes: state.scenes,
+    combos: state.combos,
+    notes: state.notes,
+    notesPrompt: activeNotesText,
     active: state.active,
     lastApplied: state.lastApplied,
     sections: [],
@@ -808,6 +1123,10 @@ async function saveScene(ctx, store, body, agents) {
   const mcpMembers = Array.isArray(body?.mcp)
     ? [...new Set(body.mcp.filter((item) => typeof item === 'string' && item))]
     : null
+  const comboId = typeof body?.comboId === 'string' ? body.comboId : ''
+  const noteIds = Array.isArray(body?.notes)
+    ? [...new Set(body.notes.filter((item) => typeof item === 'string' && item))]
+    : null
   const id = typeof body?.id === 'string' && body.id ? body.id : ''
   const previous = (await store.read()).scenes.find((item) => item.id === id)
   const skills = await captureDisabled(ctx, agents, skillNames, previous?.skills)
@@ -822,13 +1141,15 @@ async function saveScene(ctx, store, body, agents) {
       scene.bundles = members
       scene.skills = skills
       scene.mcp = mcpMembers
+      scene.notes = noteIds
+      scene.comboId = comboId
       scene.updatedAt = now
     } else {
       if (state.scenes.some((item) => item.name === name)) {
         return { ok: false, error: { code: 'duplicate-name', message: '已有同名场景' } }
       }
       savedId = newId()
-      state.scenes.push({ id: savedId, name, bundles: members, skills, mcp: mcpMembers, createdAt: now, updatedAt: now })
+      state.scenes.push({ id: savedId, name, bundles: members, skills, mcp: mcpMembers, notes: noteIds, comboId, createdAt: now, updatedAt: now })
     }
     await store.write(state)
     return { ok: true, scenes: state.scenes, savedId }
@@ -847,6 +1168,238 @@ async function deleteScene(store, body) {
     await store.write(state)
     return { ok: true, scenes: state.scenes }
   })
+}
+
+async function saveCombo(store, body) {
+  const name = typeof body?.name === 'string' ? body.name.trim() : ''
+  if (!name) return { ok: false, error: { code: 'invalid-name', message: '组合名称不能为空' } }
+  const skills = Array.isArray(body?.skills)
+    ? [...new Set(body.skills.filter((item) => typeof item === 'string' && item))].sort()
+    : []
+  const id = typeof body?.id === 'string' && body.id ? body.id : ''
+  return store.update(async () => {
+    const state = await store.read()
+    const now = new Date().toISOString()
+    let savedId = id
+    if (id) {
+      const combo = state.combos.find((item) => item.id === id)
+      if (!combo) return { ok: false, error: { code: 'unknown-combo', message: '组合不存在' } }
+      if (state.combos.some((item) => item.id !== id && item.name === name)) {
+        return { ok: false, error: { code: 'duplicate-name', message: '已有同名组合' } }
+      }
+      combo.name = name
+      combo.skills = skills
+      combo.updatedAt = now
+    } else {
+      if (state.combos.some((item) => item.name === name)) {
+        return { ok: false, error: { code: 'duplicate-name', message: '已有同名组合' } }
+      }
+      savedId = newId()
+      state.combos.push({ id: savedId, name, skills, createdAt: now, updatedAt: now })
+    }
+    await store.write(state)
+    return { ok: true, combos: state.combos, savedId }
+  })
+}
+
+async function deleteCombo(store, body) {
+  const id = typeof body?.id === 'string' ? body.id : ''
+  return store.update(async () => {
+    const state = await store.read()
+    const before = state.combos.length
+    state.combos = state.combos.filter((item) => item.id !== id)
+    if (state.combos.length === before) return { ok: false, error: { code: 'unknown-combo', message: '组合不存在' } }
+    await store.write(state)
+    return { ok: true, combos: state.combos }
+  })
+}
+
+/** Create or update one reusable note (a prose instruction block). */
+async function saveNote(store, body) {
+  const name = typeof body?.name === 'string' ? body.name.trim() : ''
+  const text = typeof body?.body === 'string' ? body.body.trim() : ''
+  if (!name) return { ok: false, error: { code: 'invalid-name', message: '注明标题不能为空' } }
+  if (!text) return { ok: false, error: { code: 'invalid-body', message: '注明内容不能为空' } }
+  const id = typeof body?.id === 'string' && body.id ? body.id : ''
+  return store.update(async () => {
+    const state = await store.read()
+    const now = new Date().toISOString()
+    let savedId = id
+    if (id) {
+      const note = state.notes.find((item) => item.id === id)
+      if (!note) return { ok: false, error: { code: 'unknown-note', message: '注明不存在' } }
+      note.name = name
+      note.body = text
+      note.updatedAt = now
+    } else {
+      savedId = newId()
+      state.notes.push({ id: savedId, name, body: text, createdAt: now, updatedAt: now })
+    }
+    await store.write(state)
+    return { ok: true, notes: state.notes, savedId }
+  })
+}
+
+async function deleteNote(store, body) {
+  const id = typeof body?.id === 'string' ? body.id : ''
+  return store.update(async () => {
+    const state = await store.read()
+    const before = state.notes.length
+    state.notes = state.notes.filter((item) => item.id !== id)
+    if (state.notes.length === before) return { ok: false, error: { code: 'unknown-note', message: '注明不存在' } }
+    for (const scene of state.scenes) {
+      if (Array.isArray(scene.notes)) scene.notes = scene.notes.filter((item) => item !== id)
+    }
+    if (state.lastApplied && Array.isArray(state.lastApplied.beforeNotes)) {
+      state.lastApplied.beforeNotes = state.lastApplied.beforeNotes.filter((item) => item !== id)
+    }
+    await store.write(state)
+    return { ok: true, notes: state.notes }
+  })
+}
+
+/** Minimal SKILL.md front-matter reader: `name:` / `description:` lines. */
+async function readSkillMeta(file) {
+  let text = ''
+  try {
+    text = await fs.readFile(file, 'utf8')
+  } catch {
+    return null
+  }
+  const meta = { name: '', description: '' }
+  const lines = text.split(/\r?\n/)
+  let inFront = false
+  for (const raw of lines) {
+    const line = raw.trim()
+    if (!line) continue
+    if (line === '---') { inFront = !inFront; if (!inFront && (meta.name || meta.description)) break; continue }
+    if (!meta.name) {
+      const named = /^name\s*:\s*(.+)$/i.exec(line)
+      if (named) { meta.name = named[1].replace(/^['"]|['"]$/g, '').trim(); continue }
+    }
+    if (!meta.description) {
+      const descd = /^description\s*:\s*(.+)$/i.exec(line)
+      if (descd) { meta.description = descd[1].replace(/^['"]|['"]$/g, '').trim(); continue }
+      if (/^#\s+/.test(line)) meta.description = line.replace(/^#\s+/, '').trim()
+    }
+    if (!inFront && (meta.name || meta.description)) break
+  }
+  return meta
+}
+
+/** Every directory that may hold local skills: the user dir plus project dirs. */
+function skillRoots(ctx) {
+  const roots = [{ label: '用户技能目录', path: path.join(homeDir(ctx), 'skills') }]
+  const seen = new Set(roots.map((root) => root.path))
+  let agents = []
+  try {
+    agents = ctx.get('agents')?.list?.() ?? []
+  } catch {
+    agents = []
+  }
+  for (const agent of agents) {
+    const cwd = agent?.session?.cwd || agent?.session?.header?.cwd || agent?.cwd
+    if (typeof cwd !== 'string' || !cwd) continue
+    for (const sub of ['.dsh/skills', '.agents/skills']) {
+      const folder = path.join(cwd, sub)
+      if (seen.has(folder)) continue
+      seen.add(folder)
+      roots.push({ label: '项目技能目录', path: folder })
+    }
+  }
+  return roots
+}
+
+/** Scan the local skill directories and mark what the registry already serves. */
+async function discoverSkills(ctx, agents) {
+  const registered = new Map()
+  for (const row of await skillInventory(ctx, agents || new Map())) registered.set(row.name, row)
+  const roots = []
+  for (const root of skillRoots(ctx)) {
+    let entries = []
+    try {
+      entries = await fs.readdir(root.path, { withFileTypes: true })
+    } catch {
+      roots.push({ label: root.label, path: root.path, exists: false, skills: [] })
+      continue
+    }
+    const skills = []
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue
+      const folder = path.join(root.path, entry.name)
+      let meta = null
+      let file = null
+      for (const candidate of [path.join(folder, 'SKILL.md'), path.join(folder, 'skill.md')]) {
+        meta = await readSkillMeta(candidate)
+        if (meta) { file = candidate; break }
+      }
+      const name = (meta && meta.name) || entry.name
+      const known = registered.get(name)
+      skills.push({
+        name,
+        folder: entry.name,
+        description: (meta && meta.description) || '',
+        path: folder,
+        registered: !!known,
+        provider: known ? known.provider : null,
+        file,
+      })
+    }
+    skills.sort((left, right) => left.name.localeCompare(right.name))
+    roots.push({ label: root.label, path: root.path, exists: true, skills })
+  }
+  // Skills the registry serves but no local directory owns (plugin-provided).
+  const localNames = new Set()
+  for (const root of roots) for (const skill of root.skills) localNames.add(skill.name)
+  const adoptedFolders = new Set()
+  try {
+    for (const entry of await fs.readdir(managedSkillsDir(ctx), { withFileTypes: true })) {
+      if (entry.isDirectory()) adoptedFolders.add(entry.name)
+    }
+  } catch {
+    /* nothing adopted yet */
+  }
+  for (const root of roots) {
+    for (const skill of root.skills) {
+      const adopted = adoptedFolders.has(skill.folder)
+      skill.adopted = adopted
+      skill.adoptable = !skill.registered && !adopted
+    }
+  }
+  const sceneSkills = []
+  for (const entry of await fs.readdir(managedSkillsDir(ctx), { withFileTypes: true }).catch(() => [])) {
+    if (!entry.isDirectory()) continue
+    const folderPath = path.join(managedSkillsDir(ctx), entry.name)
+    let meta = null
+    for (const candidate of ['SKILL.md', 'skill.md']) {
+      meta = await readSkillMeta(path.join(folderPath, candidate))
+      if (meta) break
+    }
+    const display = (meta && meta.name) || entry.name
+    sceneSkills.push({
+      folder: entry.name,
+      name: sceneSkillId(entry.name, meta && meta.name),
+      display: `${SCENE_PREFIX}${display}`,
+      description: (meta && meta.description) || '',
+      path: folderPath,
+    })
+  }
+  sceneSkills.sort((left, right) => left.display.localeCompare(right.display))
+  const provided = []
+  const byProvider = new Map()
+  for (const row of registered.values()) {
+    if (localNames.has(row.name) || row.provider === SHADOW_PROVIDER) continue
+    if (row.provider === SCENE_PROVIDER) continue
+    const key = row.provider || 'custom'
+    if (!byProvider.has(key)) byProvider.set(key, [])
+    byProvider.get(key).push({ name: row.name, description: row.description || '', provider: key })
+  }
+  for (const [provider, skills] of byProvider) {
+    skills.sort((left, right) => left.name.localeCompare(right.name))
+    provided.push({ provider, skills })
+  }
+  provided.sort((left, right) => left.provider.localeCompare(right.provider))
+  return { ok: true, roots, provided, sceneSkills, sceneDir: managedSkillsDir(ctx) }
 }
 
 async function prepareApply(ctx, store, body, setPending, lang, agents) {
@@ -1078,6 +1631,7 @@ async function finishApply(ctx, store, pending, setPending, lang) {
     await store.write(state)
   })
   setPending(null)
+  await refreshNotes(store)
   return { ok: true, results: pending.results, restartRequired, lastApplied }
 }
 

@@ -1,8 +1,8 @@
 # DSH场景设置 · dsh-plugin-sets
 
-把官方「插件」页的启用状态存成一份份**场景**，一键切换；同一份场景里还带着 **MCP 服务器**与**技能开关**。
+把官方「插件」页的启用状态存成一份份**场景**，一键切换；同一份场景里还带着 **MCP 服务器**、**技能开关**与**场景注明**。
 
-A DSH plugin that saves the official Plugins page state as named **scenes** — plugin bundles, MCP servers and skill switches together — and switches between them in one click.
+A DSH plugin that saves the official Plugins page state as named **scenes** — plugin bundles, MCP servers, skill switches and written scene notes together — and switches between them in one click.
 
 - 插件包 / bundle: `dsh-plugin-sets`
 - 入口 / entry: 设置 → **DSH场景设置**（`Settings → DSH scene settings`）
@@ -10,25 +10,33 @@ A DSH plugin that saves the official Plugins page state as named **scenes** — 
 
 ![DSH场景设置简介](assets/share-intro.png)
 
+| 插件页 | MCP 与技能组合 | 注明与搜寻技能 |
+| --- | --- | --- |
+| ![插件页](assets/shot-plugins.png) | ![MCP 与技能组合](assets/shot-mcp-skills.png) | ![注明与搜寻技能](assets/shot-notes-discover.png) |
+
 ---
 
 ## 中文
 
 ### 它做什么
 
-一个场景 = 三样东西的快照：
+一个场景 = 四样东西的快照：
 
 1. **插件**：官方「插件」页里那些带开关的 bundle（内置插件配置 / 实验性插件 / 已安装插件，布局和顺序都照官方页来，包括「更多」展开和被官方隐藏的条目）
 2. **MCP 服务器**：`@deepseek-ai/dsh-mcp-client` 那几行（例如 SolidCraft），可以单独开关
-3. **技能**：把某些技能**彻底停用**——不是藏起来，而是让模型和 `/skill` 都拿不到
+3. **技能**：把某些技能**彻底停用**——不是藏起来，而是让模型和 `/skill` 都拿不到；技能页按来源分组（场景技能 / Univer 办公 / GenUI 界面 / Windows 沙箱 / 本地技能），可以编成可复用的**技能组合**
+4. **注明**：像写记忆一样写给 AGENT 的补充说明，按条目开关，随场景一起应用并注入系统提示
 
 应用一个场景做的是**差量**：只改和当前状态不一致的那几行，逐项执行并逐项报告结果。
 
 ### 主要功能
 
-- **场景卡片**：新建 / 修改 / 复制 / 重命名 / 删除 / 应用，右键出菜单
+- **场景下拉**：顶部下拉直接切换场景，场景多了自动可滚动；旁边是保存 / 新建 / 修改 / 复制 / 刷新 / 撤销 / 删除
 - **输入框快捷键**：新会话的输入框左侧有场景 chip，点开即选即应用
-- **撤销上次应用**：把最近一次应用前的 bundle、MCP、技能状态整体还原
+- **五步编辑**：`1 插件` → `2 MCP` → `3 技能组合` → `4 注明` → `5 搜寻技能`
+- **技能组合**：把一批技能的开关存成命名组合（保存 / 更新 / 复制 / 删除），场景引用组合，组合本身也随场景一起应用
+- **搜寻技能**：扫描本机技能源（用户目录、项目目录、其它技能插件提供的技能），可把某个技能「装为场景技能」（复制到本插件自己的目录并以 `场景-` 前缀登记，不动原文件），随时「卸下」
+- **撤销上次应用**：把最近一次应用前的 bundle、MCP、技能、注明状态整体还原
 - **跟随官方页**：激活中的场景会一直跟官方页保持一致——你在官方页手动开关某行，这个改动会被吸进当前场景，两边不打架
 - **会话保护**：只要有会话正在跑（回合未结束），应用与撤销会被拒绝并提示，避免在回答中途把工具换掉
 - **需要重启时给选择**：某项改动必须重启 DSH 才生效时，可以「继续应用」或「停在这里」，之后再手动重启
@@ -50,9 +58,9 @@ A DSH plugin that saves the official Plugins page state as named **scenes** — 
 
 ### 使用
 
-1. 「＋新建场景」→ 在第 1 步「场景设置」里挑插件 → 第 2 步「MCP」挑服务器 → 第 3 步「技能」关掉不需要的
-2. 「保存」→ 回到场景卡片，点「应用场景」，确认差量后执行
-3. 日常切换：输入框左侧 chip 直接选；或右键卡片「应用场景」
+1. 「＋新建场景」→ 第 1 步「插件」挑 bundle → 第 2 步「MCP」挑服务器 → 第 3 步「技能组合」关掉不需要的技能（可存成组合）→ 第 4 步「注明」勾选要带上的说明
+2. 「保存」→ 在顶部下拉选中该场景，点「应用场景」，确认差量后执行
+3. 日常切换：输入框左侧 chip 直接选；或右键场景「应用场景」
 
 ### 数据与安全
 
@@ -82,19 +90,23 @@ A DSH plugin that saves the official Plugins page state as named **scenes** — 
 
 ### What it does
 
-A scene is a snapshot of three things:
+A scene is a snapshot of four things:
 
 1. **Plugins** — the same bundle rows the official Plugins page shows (builtin config / experimental with its “More” list / installed, same grouping and ordering)
 2. **MCP servers** — rows of `@deepseek-ai/dsh-mcp-client`, switchable per server
-3. **Skills** — skills that are **truly unusable**: neither the model nor `/skill` can resolve them
+3. **Skills** — skills that are **truly unusable**: neither the model nor `/skill` can resolve them; the skills page groups them by source (scene skills / Univer / GenUI / Windows sandbox / local) and lets you save reusable **skill combos**
+4. **Notes** — written instructions for the agent, like memory; enabled notes ride along with the scene and are injected into the system prompt
 
 Applying a scene is a **diff**: only rows that differ from the live state are touched, one by one, each with its own result.
 
 ### Features
 
-- Scene cards: create / edit / duplicate / rename / delete / apply (right-click for the menu)
+- A scene dropdown at the top (scrolls once you have many), with save / new / edit / duplicate / refresh / undo / delete beside it
 - A composer chip that applies a scene before the first message
-- Undo the last apply (plugins, MCP and skills restored together)
+- Five editing steps: `1 Plugins` → `2 MCP` → `3 Skill combos` → `4 Notes` → `5 Discover skills`
+- Skill combos: save a named set of skill switches, reuse it in scenes; the combo applies together with its scene
+- Discover skills: scans local sources (user dir, project dir, skills served by other skill plugins) and can adopt one as a scene skill (copied into this plugin's own folder and registered with a `scene-` name; the original is never touched), removable at any time
+- Undo the last apply (plugins, MCP, skills and notes restored together)
 - The active scene stays identical to the official page: manual toggles there are absorbed into it
 - Applies are refused while any chat is running, so a running answer never loses its tools mid-step
 - When a change needs a DSH restart you choose: continue applying, or stop here

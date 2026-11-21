@@ -21,9 +21,31 @@ window.__ModuleLoader__.load({
       zh: {
         title: 'DSH场景设置',
         subtitle: '像快捷方式一样切换官方「插件」页里的插件，并同时决定哪些技能可用。被激活的场景会一直跟着官方页走。',
-        stepPlugins: '场景设置',
+        stepPlugins: '1 插件',
         stepMcp: '2 MCP',
-        stepSkills: '3 技能',
+        stepSkills: '3 技能组合',
+        stepNotes: '4 注明',
+        stepDiscover: '5 搜寻技能',
+        discoverTitle: '搜寻技能',
+        discoverHint: '扫描本机技能源：用户目录、项目目录，以及其它技能插件提供的技能',
+        discoverEmpty: '还没有扫描结果。',
+        rescan: '重新扫描',
+        scanning: '扫描中…',
+        providedBy: '插件提供',
+        loadedSkill: '已加载',
+        unloadedSkill: '未加载',
+        rootMissing: '目录不存在',
+        sceneSkills: '场景技能',
+        sceneDir: '本插件自有目录',
+        adopt: '装为场景技能',
+        adopted: '已装为场景技能',
+        removeSkill: '卸下',
+        adoptDone: '已装为场景技能，可在「3 技能组合」里开关。',
+        removeDone: '已卸下（目录移到 trash，可手动找回）。',
+        scanNote: '只读取本机目录；「装为场景技能」会复制到插件自有目录，不改动原文件。',
+        pickScene: '选择场景',
+        noScene: '还没有场景',
+        rename: '重命名',
         mcpTitle: 'MCP 服务器',
         mcpHint: '关闭后该服务器提供的工具不可用',
         mcpEmpty: '当前没有 MCP 服务器。',
@@ -44,6 +66,36 @@ window.__ModuleLoader__.load({
         skillDisabled: '已关闭',
         skillCount: (on, total) => `${on} / ${total} 可用`,
         skillsPlan: (off, on) => `技能：关闭 ${off} 个，启用 ${on} 个`,
+        comboTitle: '技能组合',
+        comboPick: '选择组合',
+        comboNone: '还没有组合',
+        comboSave: '保存为组合',
+        comboUpdate: '更新组合',
+        comboCopy: '复制组合',
+        comboRename: '组合改名',
+        comboDelete: '删除组合',
+        comboName: '组合名称',
+        comboEmpty: '还没有组合：先勾选技能，再「保存为组合」。',
+        comboLoaded: (name) => `已载入组合「${name}」`,
+        comboSaved: (name) => `组合「${name}」已保存`,
+        comboDeleted: '组合已删除',
+        availableSkills: '现有技能',
+        selectedSkills: '选择技能',
+        comboMoveIn: '加入组合',
+        comboMoveOut: '移出组合',
+        notesTitle: '场景注明',
+        notesHint: '像记忆一样写给 AGENT 的补充说明；启用的条目会随场景应用注入系统提示',
+        notesEmpty: '还没有注明。新建一条，写上希望 AGENT 在这个场景里遵守的规则。',
+        noteNew: '新建注明',
+        noteEdit: '编辑',
+        noteDelete: '删除',
+        noteName: '标题',
+        noteBody: '内容（写给 AGENT 的说明）',
+        noteSaved: '注明已保存',
+        noteDeleted: '注明已删除',
+        noteNoScene: '先新建或选择一个场景，注明属于场景。',
+        notesCount: (on, total) => `${on} / ${total} 启用`,
+        notesPlan: (on, off) => `注明：启用 ${on} 条，停用 ${off} 条`,
         chipScene: (name) => `场景：${name}`,
         chipNone: '还没有场景',
         chipPick: '选择场景',
@@ -109,9 +161,31 @@ window.__ModuleLoader__.load({
       en: {
         title: 'DSH scene settings',
         subtitle: 'Switch the plugins on the official Plugins page like shortcuts and decide which skills stay usable. An active scene keeps following that page.',
-        stepPlugins: 'Scene settings',
-        stepMcp: 'MCP',
-        stepSkills: 'Skills',
+        stepPlugins: '1 Plugins',
+        stepMcp: '2 MCP',
+        stepSkills: '3 Skill combos',
+        stepNotes: '4 Notes',
+        stepDiscover: '5 Discover skills',
+        discoverTitle: 'Discover skills',
+        discoverHint: 'Scans local skill sources: user dir, project dir, and skills contributed by other skill plugins',
+        discoverEmpty: 'Nothing scanned yet.',
+        rescan: 'Scan again',
+        scanning: 'Scanning…',
+        providedBy: 'from plugins',
+        loadedSkill: 'loaded',
+        unloadedSkill: 'not loaded',
+        rootMissing: 'folder missing',
+        sceneSkills: 'Scene skills',
+        sceneDir: 'this plugin owns this folder',
+        adopt: 'Adopt as scene skill',
+        adopted: 'Adopted',
+        removeSkill: 'Remove',
+        adoptDone: 'Adopted — toggle it on the Skills tab.',
+        removeDone: 'Removed (moved to trash, restorable by hand).',
+        scanNote: 'Read-only scan. Adopting copies the folder into this plugin, the original is untouched.',
+        pickScene: 'Choose a scene',
+        noScene: 'No scenes yet',
+        rename: 'Rename',
         mcpTitle: 'MCP servers',
         mcpHint: 'A disabled server exposes no tools',
         mcpEmpty: 'No MCP servers right now.',
@@ -132,6 +206,36 @@ window.__ModuleLoader__.load({
         skillDisabled: 'disabled',
         skillCount: (on, total) => `${on} / ${total} usable`,
         skillsPlan: (off, on) => `Skills: ${off} off, ${on} on`,
+        comboTitle: 'Skill combos',
+        comboPick: 'Choose a combo',
+        comboNone: 'No combos yet',
+        comboSave: 'Save as combo',
+        comboUpdate: 'Update combo',
+        comboCopy: 'Duplicate combo',
+        comboRename: 'Rename combo',
+        comboDelete: 'Delete combo',
+        comboName: 'Combo name',
+        comboEmpty: 'No combos yet: pick skills, then “Save as combo”.',
+        comboLoaded: (name) => `Loaded combo “${name}”`,
+        comboSaved: (name) => `Combo “${name}” saved`,
+        comboDeleted: 'Combo deleted',
+        availableSkills: 'Available skills',
+        selectedSkills: 'Selected skills',
+        comboMoveIn: 'Add to combo',
+        comboMoveOut: 'Remove from combo',
+        notesTitle: 'Scene notes',
+        notesHint: 'Extra written instructions for the agent, like memory; enabled notes are injected into the system prompt with the scene',
+        notesEmpty: 'No notes yet. Create one with the rules the agent should follow in this scene.',
+        noteNew: 'New note',
+        noteEdit: 'Edit',
+        noteDelete: 'Delete',
+        noteName: 'Title',
+        noteBody: 'Body (instructions for the agent)',
+        noteSaved: 'Note saved',
+        noteDeleted: 'Note deleted',
+        noteNoScene: 'Create or pick a scene first: notes belong to a scene.',
+        notesCount: (on, total) => `${on} / ${total} enabled`,
+        notesPlan: (on, off) => `Notes: ${on} enabled, ${off} disabled`,
         chipScene: (name) => `Scene: ${name}`,
         chipNone: 'No scenes yet',
         chipPick: 'Choose a scene',
@@ -272,6 +376,8 @@ window.__ModuleLoader__.load({
       bundles: scene ? [...scene.bundles] : [],
       skills: scene ? (scene.skills || []).map((entry) => entry.name) : [],
       mcp: scene && Array.isArray(scene.mcp) ? [...scene.mcp] : null,
+      notes: scene && Array.isArray(scene.notes) ? [...scene.notes] : null,
+      comboId: scene && scene.comboId ? scene.comboId : '',
     })
 
     const sceneSkills = (scene) => (scene && scene.skills ? scene.skills : []).map((entry) => entry.name)
@@ -282,6 +388,7 @@ window.__ModuleLoader__.load({
       && sameSet(draft.bundles, scene.bundles)
       && sameSet(draft.skills || [], sceneSkills(scene))
       && (Array.isArray(scene.mcp) ? sameSet(draft.mcp || [], scene.mcp) : true)
+      && (Array.isArray(scene.notes) ? sameSet(draft.notes || [], scene.notes) : true)
 
     /* The official Plugins page groups and orders bundles with these lists.
        They are copied verbatim so this page lists exactly the same plugins in
@@ -503,56 +610,6 @@ window.__ModuleLoader__.load({
         : h(Switch, { checked, disabled, onChange: onToggle, label: row.title || row.name }))
     }
 
-    function SceneCard({ scene, active, count, selected, onSelect, onContext }) {
-      return h('button', {
-        type: 'button',
-        onClick: onSelect,
-        onContextMenu: (event) => { event.preventDefault(); onContext(event) },
-        'aria-pressed': selected ? 'true' : 'false',
-        style: {
-          textAlign: 'left', font: 'inherit', cursor: 'pointer', minHeight: 76,
-          padding: '12px 14px', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 4,
-          background: selected ? SURFACE_2 : SURFACE,
-          border: selected ? `.5px solid ${ACCENT}` : `.5px solid ${BORDER}`,
-          color: TEXT_1,
-        },
-      },
-      h('div', { style: { display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 } },
-        h('span', { style: { fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, scene.name),
-        active ? h('span', {
-          style: {
-            fontSize: 10, padding: '1px 6px', borderRadius: 999, border: `.5px solid ${ACCENT}`,
-            color: ACCENT, flex: '0 0 auto',
-          },
-        }, scene.activeLabel) : null),
-      h('div', { style: { fontSize: 12, color: MUTED } }, count))
-    }
-
-    function MenuItem({ onClick, children }) {
-      return h('button', {
-        type: 'button',
-        onClick,
-        role: 'menuitem',
-        style: {
-          textAlign: 'left', font: 'inherit', fontSize: 13, color: TEXT_1, cursor: 'pointer',
-          padding: '7px 10px', borderRadius: 7, background: 'transparent', border: 'none',
-        },
-        onMouseEnter: (event) => { event.currentTarget.style.background = SURFACE },
-        onMouseLeave: (event) => { event.currentTarget.style.background = 'transparent' },
-      }, children)
-    }
-
-    function AddTile({ label, onClick, disabled }) {
-      return h('button', {
-        type: 'button', onClick, disabled,
-        style: {
-          minHeight: 76, padding: '12px 14px', borderRadius: 12, cursor: disabled ? 'default' : 'pointer',
-          font: 'inherit', fontSize: 13, color: MUTED, background: 'transparent',
-          border: `.5px dashed ${BORDER_STRONG}`, display: 'flex', alignItems: 'center', gap: 8,
-        },
-      }, h('span', { style: { fontSize: 15, lineHeight: 1 } }, '+'), label)
-    }
-
     function Page() {
       const [lang, setLang] = useState(readLang)
       currentLang = lang
@@ -578,6 +635,10 @@ window.__ModuleLoader__.load({
       const [step, setStep] = useState('plugins')
       const [menu, setMenu] = useState(null)
       const [renaming, setRenaming] = useState(null)
+      const [comboForm, setComboForm] = useState(null)
+      const [noteForm, setNoteForm] = useState(null)
+      const [scan, setScan] = useState(null)
+      const [scanBusy, setScanBusy] = useState(false)
 
       const busyRef = useRef(false)
       const cancelRef = useRef(false)
@@ -747,7 +808,7 @@ window.__ModuleLoader__.load({
         const liveMcp = mcpInventory.filter((row) => row.enabled && !row.readOnlyReason).map((row) => row.entryId)
         loadedSceneRef.current = ''
         setSelectedId('')
-        setDraft({ id: '', name: '', bundles: [], skills: [], mcp: liveMcp })
+        setDraft({ id: '', name: '', bundles: [], skills: [], mcp: liveMcp, notes: [] })
         setStep('plugins')
         setNote(null)
         setResults(null)
@@ -863,7 +924,7 @@ window.__ModuleLoader__.load({
         if (!name) { setNote({ tone: 'error', text: T.sceneName }); return }
         try {
           setBusy(true)
-          const json = await api('scene/save', { id: draft.id || undefined, name, bundles: draft.bundles, skills: draft.skills || [], mcp: Array.isArray(draft.mcp) ? draft.mcp : null })
+          const json = await api('scene/save', { id: draft.id || undefined, name, bundles: draft.bundles, skills: draft.skills || [], mcp: Array.isArray(draft.mcp) ? draft.mcp : null, notes: Array.isArray(draft.notes) ? draft.notes : null, comboId: draft.comboId || '' })
           setData((current) => (current ? { ...current, scenes: json.scenes } : current))
           setSelectedId(json.savedId)
           setNote({ tone: 'ok', text: T.savedToast })
@@ -1013,18 +1074,65 @@ window.__ModuleLoader__.load({
         }
       }
 
+      const runScan = useCallback(async () => {
+        if (scanBusy) return
+        setScanBusy(true)
+        try {
+          const json = await api('discover/scan', {})
+          setScan(json)
+        } catch (error) {
+          setNote({ tone: 'error', text: errorText(error) })
+        } finally {
+          setScanBusy(false)
+        }
+      }, [scanBusy])
+
+      useEffect(() => {
+        if (step !== 'discover' || scan || scanBusy) return
+        runScan()
+      }, [step, scan, scanBusy, runScan])
+
+      const adoptSkill = async (skill) => {
+        try {
+          setScanBusy(true)
+          await api('discover/adopt', { path: skill.path })
+          setNote({ tone: 'ok', text: T.adoptDone })
+          setScan(null)
+          load(true)
+        } catch (error) {
+          setNote({ tone: 'error', text: errorText(error) })
+        } finally {
+          setScanBusy(false)
+        }
+      }
+
+      const removeSkill = async (folder) => {
+        try {
+          setScanBusy(true)
+          await api('discover/remove', { folder })
+          setNote({ tone: 'ok', text: T.removeDone })
+          setScan(null)
+          load(true)
+        } catch (error) {
+          setNote({ tone: 'error', text: errorText(error) })
+        } finally {
+          setScanBusy(false)
+        }
+      }
+
       const activeId = data && data.active ? data.active.sceneId : ''
       // A scene swap rewrites the live plugin set, so the host refuses it while a
       // chat is running; show that up front instead of on click.
       const runningChats = data && Array.isArray(data.running) ? data.running : []
       const runningNames = runningChats.map((entry) => entry.title || '').filter(Boolean).join('、')
       const dirty = !!draft && (() => {
-        if (!draft.id) return draft.name.trim().length > 0 || draft.bundles.length > 0 || (draft.skills || []).length > 0
+        if (!draft.id) return draft.name.trim().length > 0 || draft.bundles.length > 0 || (draft.skills || []).length > 0 || (draft.notes || []).length > 0
         if (!selectedScene) return true
         return draft.name !== selectedScene.name
           || !sameSet(draft.bundles, selectedScene.bundles)
           || !sameSet(draft.skills || [], sceneSkills(selectedScene))
           || (Array.isArray(draft.mcp) && (!Array.isArray(selectedScene.mcp) || !sameSet(draft.mcp, selectedScene.mcp)))
+          || (Array.isArray(draft.notes) && (!Array.isArray(selectedScene.notes) || !sameSet(draft.notes, selectedScene.notes)))
       })()
 
       const renderBundleRow = (row) => {
@@ -1073,6 +1181,176 @@ window.__ModuleLoader__.load({
         })
       }
 
+      // ---- skill combos: named, reusable sets of switched-on skills ----
+      const combos = data && Array.isArray(data.combos) ? data.combos : []
+      const skillOnNames = skillsInventory.filter((row) => !disabledSkills.includes(row.name)).map((row) => row.name)
+      // Adopted skills are stored as `scene-<id>` because the registry requires
+      // kebab-case, but they are always shown with the 场景- prefix.
+      const skillLabel = (row) => {
+        const source = (row && row.provider) || ''
+        const name = (row && row.name) || ''
+        if (row && row.display) return row.display
+        return source === 'dsh-plugin-sets-scene' ? `场景-${name.replace(/^scene-/, '')}` : name
+      }
+      // Skills are grouped by where they come from, so a masked skill still
+      // sits under its real owner (Univer, GenUI, …) instead of the shadow.
+      const ORIGIN_LABELS = {
+        univer: { zh: 'Univer 办公', en: 'Univer office' },
+        'dsh-genui': { zh: 'GenUI 界面', en: 'GenUI interface' },
+        'dsh-windows-acl': { zh: 'Windows 沙箱', en: 'Windows sandbox' },
+        'dsh-plugin-sets-scene': { zh: '场景技能', en: 'Scene skills' },
+        'dsh-skills-manager-external': { zh: '技能管理器', en: 'Skills manager' },
+        custom: { zh: '本地技能', en: 'Local skills' },
+      }
+      const originLabel = (key) => {
+        const hit = ORIGIN_LABELS[key]
+        if (hit) return lang === 'en' ? hit.en : hit.zh
+        if (key === 'dsh-plugin-sets-shadow') return lang === 'en' ? 'Other' : '其它'
+        return key
+      }
+      const groupByProvider = (rows) => {
+        // Older disabled entries were captured before the origin was stored;
+        // recover the owner from the name so the grouping never regresses.
+        const LEGACY_ORIGIN = (name) => {
+          if (name === 'genui') return 'dsh-genui'
+          if (name === 'diagnose-windows-sandbox-acl') return 'dsh-windows-acl'
+          if (/^(office|univer)(-|$)/.test(name)) return 'univer'
+          return 'custom'
+        }
+        const order = []
+        const map = new Map()
+        for (const row of rows) {
+          const raw = row.origin && row.origin !== 'dsh-plugin-sets-shadow' ? row.origin : LEGACY_ORIGIN(row.name)
+          const key = raw || row.provider || 'custom'
+          if (!map.has(key)) { map.set(key, []); order.push(key) }
+          map.get(key).push(row)
+        }
+        // 场景技能 always first: the built-in routing skill is the entry point.
+        order.sort((left, right) => (right === 'dsh-plugin-sets-scene' ? 1 : 0) - (left === 'dsh-plugin-sets-scene' ? 1 : 0) || left.localeCompare(right))
+        return order.map((key) => ({ key, label: originLabel(key), rows: map.get(key) }))
+      }
+      const loadCombo = (id) => {
+        const combo = combos.find((item) => item.id === id)
+        if (!combo || !draft) return
+        const chosen = new Set(combo.skills)
+        setDraft({
+          ...draft,
+          comboId: combo.id,
+          skills: skillsInventory.filter((row) => !chosen.has(row.name)).map((row) => row.name),
+        })
+        setNote({ tone: 'ok', text: T.comboLoaded(combo.name) })
+      }
+      const submitCombo = async () => {
+        if (!comboForm) return
+        const name = String(comboForm.value || '').trim()
+        if (!name) { setNote({ tone: 'error', text: T.renameEmpty }); return }
+        try {
+          setBusy(true)
+          await api('combo/save', { id: comboForm.id, name, skills: skillOnNames })
+          await load(true)
+          setDraft((current) => (current ? { ...current, comboId: comboForm.id || current.comboId } : current))
+          setComboForm(null)
+          setNote({ tone: 'ok', text: T.comboSaved(name) })
+        } catch (error) {
+          setNote({ tone: 'error', text: errorText(error) })
+        } finally {
+          setBusy(false)
+        }
+      }
+      const removeCombo = async (id) => {
+        if (!id) return
+        try {
+          setBusy(true)
+          await api('combo/delete', { id })
+          await load(true)
+          setDraft((current) => (current && current.comboId === id ? { ...current, comboId: '' } : current))
+          setNote({ tone: 'ok', text: T.comboDeleted })
+        } catch (error) {
+          setNote({ tone: 'error', text: errorText(error) })
+        } finally {
+          setBusy(false)
+        }
+      }
+      const comboSelected = combos.find((item) => item.id === (draft && draft.comboId)) || null
+
+      // ---- notes: written instructions that ride along with a scene ----
+      const notes = data && Array.isArray(data.notes) ? data.notes : []
+      const draftNotes = draft && Array.isArray(draft.notes) ? draft.notes : []
+      const toggleNote = (id) => {
+        setDraft((current) => {
+          if (!current) return current
+          const list = Array.isArray(current.notes) ? current.notes : []
+          return { ...current, notes: list.includes(id) ? list.filter((item) => item !== id) : [...list, id] }
+        })
+      }
+      const setAllNotes = (on) => {
+        setDraft((current) => (current ? { ...current, notes: on ? notes.map((item) => item.id) : [] } : current))
+      }
+      const submitNote = async () => {
+        if (!noteForm) return
+        const name = String(noteForm.name || '').trim()
+        const body = String(noteForm.body || '').trim()
+        if (!name) { setNote({ tone: 'error', text: T.noteName }); return }
+        if (!body) { setNote({ tone: 'error', text: T.noteBody }); return }
+        try {
+          setBusy(true)
+          const json = await api('note/save', { id: noteForm.id || undefined, name, body })
+          setData((current) => (current ? { ...current, notes: json.notes } : current))
+          if (!noteForm.id) {
+            setDraft((current) => (current ? { ...current, notes: [...(current.notes || []), json.savedId] } : current))
+          }
+          setNoteForm(null)
+          setNote({ tone: 'ok', text: T.noteSaved })
+        } catch (error) {
+          setNote({ tone: 'error', text: errorText(error) })
+        } finally {
+          setBusy(false)
+        }
+      }
+      const removeNote = async (id) => {
+        if (!id) return
+        try {
+          setBusy(true)
+          const json = await api('note/delete', { id })
+          setData((current) => (current ? { ...current, notes: json.notes } : current))
+          setDraft((current) => (current && Array.isArray(current.notes) ? { ...current, notes: current.notes.filter((item) => item !== id) } : current))
+          setNoteForm(null)
+          setNote({ tone: 'ok', text: T.noteDeleted })
+        } catch (error) {
+          setNote({ tone: 'error', text: errorText(error) })
+        } finally {
+          setBusy(false)
+        }
+      }
+      const renderComboSkill = (row, side) => h('button', {
+        key: `${side}-${row.name}`,
+        type: 'button',
+        disabled: busy,
+        onClick: () => toggleSkill(row.name),
+        title: side === 'in' ? T.comboMoveOut : T.comboMoveIn,
+        style: {
+          display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left',
+          font: 'inherit', fontSize: 12, color: TEXT_1, background: 'transparent',
+          border: 'none', padding: '6px 8px', borderRadius: 6, cursor: busy ? 'default' : 'pointer',
+        },
+      },
+      h('span', { style: { flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, skillLabel(row)),
+      h('span', { style: { color: MUTED, flex: '0 0 auto' } }, side === 'in' ? '‹' : '›'))
+      const skillPanel = (title, rows, side) => h('div', {
+        style: {
+          display: 'flex', flexDirection: 'column', gap: 4, padding: 10, borderRadius: 10,
+          background: SURFACE, border: `.5px solid ${BORDER}`, minHeight: 120,
+        },
+      },
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, padding: '0 2px 4px' } },
+        h('span', { style: { fontSize: 12, fontWeight: 600, color: TEXT_2 } }, title),
+        h('span', { style: { fontSize: 11, color: MUTED } }, String(rows.length))),
+      rows.length === 0
+        ? h('div', { style: { fontSize: 12, color: MUTED, padding: '6px 8px' } }, T.skillsEmpty)
+        : groupByProvider(rows).map((group) => h('div', { key: group.key, style: { display: 'flex', flexDirection: 'column' } },
+          h('div', { style: { fontSize: 11, color: MUTED, padding: '4px 8px 2px' } }, group.label),
+          group.rows.map((row) => renderComboSkill(row, side)))))
+
       const renderMcpRow = (row) => {
         const canToggle = !row.readOnlyReason
         const on = effectiveMcp.includes(row.entryId)
@@ -1088,11 +1366,22 @@ window.__ModuleLoader__.load({
         })
       }
 
-      const cards = scenes.slice()
-      const minCells = Math.max(3, Math.min(9, Math.ceil((cards.length + 1) / 3) * 3))
-      const addCells = Math.max(1, minCells - cards.length)
-
-      const cardLabel = { ...T }
+      const renderDiscoverRow = (skill) => h('div', {
+        key: `${skill.folder || skill.name}-${skill.name}`,
+        style: {
+          display: 'flex', gap: 10, alignItems: 'center', padding: '8px 12px',
+          borderTop: `.5px solid ${BORDER}`,
+        },
+      },
+      h('div', { style: { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 } },
+        h('span', { style: { fontSize: 13, fontWeight: 500, color: TEXT_1 } }, skill.display || skill.name),
+        h('span', { style: { fontSize: 12, color: MUTED } }, skill.description || skill.folder || '')),
+      h('span', { style: { fontSize: 11, color: MUTED, whiteSpace: 'nowrap' } }, skill.adopted ? T.adopted : skill.adoptable ? '' : skill.registered ? T.loadedSkill : T.unloadedSkill),
+      skill.adopted
+        ? h(Button, { size: 'sm', variant: 'danger', disabled: busy || scanBusy, onClick: () => removeSkill(skill.folder) }, T.removeSkill)
+        : skill.adoptable
+          ? h(Button, { size: 'sm', variant: 'ghost', disabled: busy || scanBusy, onClick: () => adoptSkill(skill) }, T.adopt)
+          : null)
 
       return h('div', {
         style: {
@@ -1104,10 +1393,7 @@ window.__ModuleLoader__.load({
       h('header', { style: { display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' } },
         h('div', { style: { flex: '1 1 320px', minWidth: 0 } },
           h('h2', { style: { margin: 0, fontSize: 18, fontWeight: 600 } }, T.title),
-          h('p', { style: { margin: '4px 0 0', fontSize: 13, color: MUTED } }, T.subtitle)),
-        h('div', { style: { display: 'flex', gap: 8, alignItems: 'center' } },
-          h(Button, { onClick: () => load(false), disabled: busy, size: 'sm' }, T.refresh),
-          h(Button, { onClick: newScene, variant: 'primary', size: 'sm' }, `+ ${T.newScene}`))),
+          h('p', { style: { margin: '4px 0 0', fontSize: 13, color: MUTED } }, T.subtitle))),
 
       loadError ? h('div', { style: { padding: 10, borderRadius: 8, background: SURFACE, color: DANGER } }, `${T.loadFailed}: ${loadError}`) : null,
       note ? h('div', {
@@ -1118,29 +1404,6 @@ window.__ModuleLoader__.load({
         },
       }, note.text) : null,
 
-      // scene grid
-      h('div', {
-        style: {
-          display: 'grid', gap: 10,
-          gridTemplateColumns: 'repeat(auto-fill, minmax(196px, 1fr))',
-        },
-      },
-      cards.map((scene) => h(SceneCard, {
-        key: scene.id,
-        scene: { ...scene, activeLabel: cardLabel.active },
-        active: scene.id === activeId,
-        count: countOf(scene),
-        selected: scene.id === selectedId,
-        onSelect: () => choose(scene),
-        onContext: (event) => setMenu({ scene, x: event.clientX, y: event.clientY }),
-      })),
-      Array.from({ length: addCells }).map((_, index) => h(AddTile, {
-        key: `add-${index}`,
-        label: T.addScene,
-        onClick: newScene,
-        disabled: busy,
-      }))),
-
       loading && !data ? h('div', { style: { color: MUTED } }, T.applying) : null,
 
       // detail
@@ -1150,53 +1413,94 @@ window.__ModuleLoader__.load({
           background: SURFACE, border: `.5px solid ${BORDER}`,
         },
       },
-      h('div', { style: { display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' } },
-        h('input', {
-          value: draft.name,
-          placeholder: T.sceneName,
-          'aria-label': T.sceneName,
-          onChange: (event) => setDraft({ ...draft, name: event.target.value }),
-          style: {
-            flex: '1 1 240px', minWidth: 180, height: 34, padding: '0 12px', font: 'inherit', fontSize: 13,
-            color: TEXT_1, background: 'transparent', border: `.5px solid ${BORDER_STRONG}`,
-            borderRadius: 8, outline: 'none',
+      !draft.id ? h('input', {
+        value: draft.name,
+        placeholder: T.sceneName,
+        'aria-label': T.sceneName,
+        onChange: (event) => setDraft({ ...draft, name: event.target.value }),
+        style: {
+          width: '100%', height: 34, padding: '0 12px', font: 'inherit', fontSize: 13, boxSizing: 'border-box',
+          color: TEXT_1, background: 'transparent', border: `.5px solid ${BORDER_STRONG}`,
+          borderRadius: 8, outline: 'none',
+        },
+      }) : null,
+
+      // toolbar: scene picker on the left, primary actions right-aligned
+      h('div', {
+        style: {
+          display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap',
+          padding: '10px 12px', borderRadius: 12,
+          background: SURFACE, border: `.5px solid ${BORDER}`,
+        },
+      },
+      h('div', { style: { display: 'flex', gap: 6, alignItems: 'center', flex: '1 1 260px', minWidth: 0 } },
+        h('select', {
+          value: draft.id || '',
+          'aria-label': T.pickScene,
+          disabled: busy,
+          onChange: (event) => {
+            const next = scenes.find((scene) => scene.id === event.target.value)
+            if (next) choose(next)
           },
-        }),
+          style: {
+            flex: '1 1 200px', minWidth: 150, height: 32, padding: '0 10px', font: 'inherit', fontSize: 13,
+            color: TEXT_1, background: SURFACE_2, border: `.5px solid ${BORDER_STRONG}`,
+            borderRadius: 8, outline: 'none', cursor: 'pointer',
+          },
+        },
+        scenes.length
+          ? scenes.map((scene) => h('option', { key: scene.id, value: scene.id },
+            `${scene.id === activeId ? '✓ ' : ''}${scene.name}`))
+          : h('option', { key: 'none', value: '' }, T.noScene)),
+        draft.id
+          ? h(Button, {
+            onClick: () => setRenaming({ scene: selectedScene || draft, value: draft.name }),
+            size: 'sm', variant: 'ghost', disabled: busy, title: T.rename,
+          }, '✎')
+          : null,
         dirty
-          ? h('span', { style: { fontSize: 11, color: MUTED, border: `.5px solid ${BORDER_STRONG}`, borderRadius: 999, padding: '2px 8px' } }, T.unsaved)
-          : h('span', { style: { fontSize: 11, color: MUTED } }, T.saved),
-        h(Button, { onClick: saveDraft, variant: 'primary', disabled: busy || !dirty }, T.save),
-        h(Button, { onClick: editScene, disabled: busy || !draft.id }, T.edit),
-        h(Button, { onClick: () => copyScene(selectedScene || draft), disabled: busy || !draft.id }, T.ctxCopy)),
-
-      // three editing steps: plugins, MCP servers, then skills
-      h('div', { style: { display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' } },
-        h(Button, { onClick: () => setStep('plugins'), size: 'sm', variant: step === 'plugins' ? 'primary' : 'ghost' }, T.stepPlugins),
-        h(Button, { onClick: () => setStep('mcp'), size: 'sm', variant: step === 'mcp' ? 'primary' : 'ghost' }, T.stepMcp),
-        h(Button, { onClick: () => setStep('skills'), size: 'sm', variant: step === 'skills' ? 'primary' : 'ghost' }, T.stepSkills),
-        h('div', { style: { flex: 1 } }),
-        step === 'skills'
-          ? h('span', { style: { fontSize: 11, color: MUTED } }, `${T.skillCount(skillOnCount, skillsInventory.length)} · ${T.skillsHint}`)
-          : step === 'mcp'
-            ? h('span', { style: { fontSize: 11, color: MUTED } }, `${T.mcpCount(mcpOnCount, mcpInventory.length)} · ${T.mcpHint}`)
-            : null),
-
-      h('div', { style: { display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' } },
-        h('div', { style: { flex: 1 } }),
+          ? h('span', { style: { fontSize: 11, color: MUTED, border: `.5px solid ${BORDER_STRONG}`, borderRadius: 999, padding: '2px 8px', whiteSpace: 'nowrap' } }, T.unsaved)
+          : h('span', { style: { fontSize: 11, color: MUTED, whiteSpace: 'nowrap' } }, T.saved)),
+      h('div', { style: { display: 'flex', gap: 8, alignItems: 'center', marginLeft: 'auto' } },
+        h(Button, { onClick: newScene, size: 'sm', variant: 'ghost', disabled: busy }, `+ ${T.newScene}`),
+        h(Button, { onClick: saveDraft, variant: 'primary', size: 'sm', disabled: busy || !dirty }, T.save),
         h(Button, {
           onClick: () => startApply(draft.id ? selectedScene : { ...draft, id: '' }),
           variant: 'primary',
           disabled: busy || !draft.id || runningChats.length > 0,
           size: 'sm',
           title: runningChats.length > 0 ? T.sessionsBusy(runningNames) : undefined,
-        }, busy ? T.applying : T.apply),
+        }, busy ? T.applying : T.apply))),
+
+      // secondary actions, right-aligned on their own row
+      h('div', { style: { display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' } },
+        h(Button, { onClick: editScene, disabled: busy || !draft.id, size: 'sm', variant: 'ghost' }, T.edit),
+        h(Button, { onClick: () => copyScene(selectedScene || draft), disabled: busy || !draft.id, size: 'sm', variant: 'ghost' }, T.ctxCopy),
+        h(Button, { onClick: () => load(false), disabled: busy, size: 'sm', variant: 'ghost' }, T.refresh),
         h(Button, {
           onClick: runUndo,
           disabled: busy || !data || !data.lastApplied || runningChats.length > 0,
           size: 'sm',
+          variant: 'ghost',
           title: runningChats.length > 0 ? T.sessionsBusy(runningNames) : undefined,
         }, T.undo),
         h(Button, { onClick: removeScene, variant: 'danger', disabled: busy || !draft.id, size: 'sm' }, T.remove)),
+
+      // four editing steps: plugins, MCP servers, skills, discovery
+      h('div', { style: { display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' } },
+        h(Button, { onClick: () => setStep('plugins'), size: 'sm', variant: step === 'plugins' ? 'primary' : 'ghost' }, T.stepPlugins),
+        h(Button, { onClick: () => setStep('mcp'), size: 'sm', variant: step === 'mcp' ? 'primary' : 'ghost' }, T.stepMcp),
+        h(Button, { onClick: () => setStep('skills'), size: 'sm', variant: step === 'skills' ? 'primary' : 'ghost' }, T.stepSkills),
+        h(Button, { onClick: () => setStep('notes'), size: 'sm', variant: step === 'notes' ? 'primary' : 'ghost' }, T.stepNotes),
+        h(Button, { onClick: () => setStep('discover'), size: 'sm', variant: step === 'discover' ? 'primary' : 'ghost' }, T.stepDiscover),
+        h('div', { style: { flex: 1 } }),
+        step === 'skills'
+          ? h('span', { style: { fontSize: 11, color: MUTED } }, `${T.skillCount(skillOnCount, skillsInventory.length)} · ${T.skillsHint}`)
+          : step === 'mcp'
+            ? h('span', { style: { fontSize: 11, color: MUTED } }, `${T.mcpCount(mcpOnCount, mcpInventory.length)} · ${T.mcpHint}`)
+            : step === 'notes'
+              ? h('span', { style: { fontSize: 11, color: MUTED } }, `${T.notesCount(draftNotes.length, notes.length)} · ${T.notesHint}`)
+              : null),
 
       runningChats.length > 0
         ? h('div', { style: { fontSize: 12, color: MUTED } }, T.sessionsBusy(runningNames))
@@ -1206,18 +1510,40 @@ window.__ModuleLoader__.load({
 
       // sections — step 1 mirrors the official page, step 2 MCP servers, step 3 skills
       step === 'skills'
-        ? h(Section, {
-          title: T.skillsTitle,
-          hint: String(skillsInventory.length),
-          action: draft
-            ? h('div', { style: { display: 'flex', gap: 6 } },
-              h(Button, { onClick: () => setAllSkills(true), disabled: busy, size: 'sm' }, T.enableAll),
-              h(Button, { onClick: () => setAllSkills(false), disabled: busy, size: 'sm' }, T.disableAll))
-            : null,
-        },
-        skillsInventory.length
-          ? skillsInventory.map(renderSkillRow)
-          : h('div', { style: { fontSize: 12, color: MUTED } }, T.skillsEmpty))
+        ? h('div', { style: { display: 'flex', flexDirection: 'column', gap: 10 } },
+          h('div', {
+            style: {
+              display: 'flex', flexDirection: 'column', gap: 8,
+              padding: '10px 12px', borderRadius: 10, background: SURFACE, border: `.5px solid ${BORDER}`,
+            },
+          },
+          h('div', { style: { display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' } },
+            h('span', { style: { fontSize: 12, fontWeight: 600, color: TEXT_2, flex: '0 0 auto' } }, T.comboTitle),
+            h('select', {
+              value: (draft && draft.comboId) || '',
+              'aria-label': T.comboPick,
+              disabled: busy || combos.length === 0,
+              onChange: (event) => loadCombo(event.target.value),
+              style: {
+                flex: '1 1 180px', minWidth: 140, height: 30, padding: '0 8px', font: 'inherit', fontSize: 12,
+                color: TEXT_1, background: SURFACE_2, border: `.5px solid ${BORDER_STRONG}`,
+                borderRadius: 8, outline: 'none', cursor: 'pointer',
+              },
+            },
+            combos.length
+              ? combos.map((combo) => h('option', { key: combo.id, value: combo.id }, combo.name))
+              : h('option', { key: 'none', value: '' }, T.comboNone)),
+            h('div', { style: { display: 'flex', gap: 8, alignItems: 'center', marginLeft: 'auto' } },
+              h(Button, { onClick: () => setComboForm({ id: '', value: (draft && draft.name) || '' }), size: 'sm', variant: 'ghost', disabled: busy || !draft }, T.comboSave),
+              comboSelected ? h(Button, { onClick: () => setComboForm({ id: comboSelected.id, value: comboSelected.name }), size: 'sm', variant: 'ghost', disabled: busy }, T.comboUpdate) : null,
+              comboSelected ? h(Button, { onClick: () => setComboForm({ id: '', value: `${comboSelected.name}${T.dupSuffix}` }), size: 'sm', variant: 'ghost', disabled: busy }, T.comboCopy) : null)),
+          h('div', { style: { display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap' } },
+            h(Button, { onClick: () => setAllSkills(true), size: 'sm', variant: 'ghost', disabled: busy || !draft }, T.enableAll),
+            h(Button, { onClick: () => setAllSkills(false), size: 'sm', variant: 'ghost', disabled: busy || !draft }, T.disableAll),
+            comboSelected ? h(Button, { onClick: () => removeCombo(comboSelected.id), size: 'sm', variant: 'danger', disabled: busy }, T.comboDelete) : null)),
+          h('div', { style: { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 10, alignItems: 'start' } },
+            skillPanel(T.availableSkills, skillsInventory.filter((row) => disabledSkills.includes(row.name)), 'out'),
+            skillPanel(T.selectedSkills, skillsInventory.filter((row) => !disabledSkills.includes(row.name)), 'in')))
         : step === 'mcp'
         ? h(Section, {
           title: T.mcpTitle,
@@ -1231,6 +1557,81 @@ window.__ModuleLoader__.load({
         mcpInventory.length
           ? mcpInventory.map(renderMcpRow)
           : h('div', { style: { fontSize: 12, color: MUTED } }, T.mcpEmpty))
+        : step === 'notes'
+        ? h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } },
+          h('div', {
+            style: {
+              display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap',
+              padding: '10px 12px', borderRadius: 10, background: SURFACE, border: `.5px solid ${BORDER}`,
+            },
+          },
+          h('div', { style: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 } },
+            h('span', { style: { fontSize: 12, fontWeight: 600, color: TEXT_2 } }, T.notesTitle),
+            h('span', { style: { fontSize: 11, color: MUTED } }, T.notesHint)),
+          h('div', { style: { marginLeft: 'auto', display: 'flex', gap: 6, flexWrap: 'wrap' } },
+            h(Button, { onClick: () => setNoteForm({ id: '', name: '', body: '' }), size: 'sm', disabled: busy || !draft }, T.noteNew),
+            h(Button, { onClick: () => setAllNotes(true), size: 'sm', variant: 'ghost', disabled: busy || !draft || notes.length === 0 }, T.enableAll),
+            h(Button, { onClick: () => setAllNotes(false), size: 'sm', variant: 'ghost', disabled: busy || !draft || notes.length === 0 }, T.disableAll))),
+          notes.length === 0
+            ? h('div', { style: { fontSize: 12, color: MUTED, padding: '6px 4px' } }, T.notesEmpty)
+            : notes.map((item) => h('div', {
+              key: item.id,
+              style: { display: 'flex', alignItems: 'flex-start', gap: 8 },
+            },
+            h('div', { style: { flex: '1 1 auto', minWidth: 0 } },
+              h(Row, {
+                row: { name: item.id, title: item.name, description: String(item.body || '').replace(/\s+/g, ' ').slice(0, 160) },
+                checked: draftNotes.includes(item.id),
+                noSwitch: !draft || busy,
+                onToggle: () => toggleNote(item.id),
+              })),
+            h('div', { style: { flex: '0 0 auto', paddingTop: 10 } },
+              h(Button, { size: 'sm', variant: 'ghost', disabled: busy, onClick: () => setNoteForm({ id: item.id, name: item.name, body: item.body || '' }) }, T.noteEdit)))))
+        : step === 'discover'
+        ? h('div', { style: { display: 'flex', flexDirection: 'column', gap: 10 } },
+          h('div', {
+            style: {
+              display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap',
+              padding: '10px 12px', borderRadius: 10, background: SURFACE, border: `.5px solid ${BORDER}`,
+            },
+          },
+          h('div', { style: { display: 'flex', flexDirection: 'column', gap: 2 } },
+            h('span', { style: { fontSize: 12, fontWeight: 600, color: TEXT_2 } }, T.discoverTitle),
+            h('span', { style: { fontSize: 11, color: MUTED } }, T.discoverHint)),
+          h('div', { style: { marginLeft: 'auto' } },
+            h(Button, { onClick: runScan, size: 'sm', variant: 'ghost', disabled: scanBusy }, scanBusy ? T.scanning : T.rescan))),
+          !scan
+            ? h(Section, { title: T.discoverTitle }, h('div', { style: { fontSize: 12, color: MUTED } }, scanBusy ? T.scanning : T.discoverEmpty))
+            : [
+              (scan.sceneSkills || []).length
+                ? h(Section, {
+                  key: 'scene-skills',
+                  title: T.sceneSkills,
+                  hint: scan.sceneDir || T.sceneDir,
+                  action: h('span', { style: { fontSize: 11, color: MUTED } }, String((scan.sceneSkills || []).length)),
+                }, scan.sceneSkills.map((skill) => renderDiscoverRow({ ...skill, adopted: true })))
+                : null,
+              ...scan.roots.map((root) => h(Section, {
+                key: root.path,
+                title: root.label,
+                hint: root.path,
+                action: h('span', { style: { fontSize: 11, color: MUTED } }, root.exists ? String(root.skills.length) : T.rootMissing),
+              }, root.exists && root.skills.length
+                ? root.skills.map((skill) => renderDiscoverRow(skill))
+                : null)),
+              ...scan.provided.map((group) => h(Section, {
+                key: group.provider,
+                title: originLabel(group.provider),
+                hint: T.providedBy,
+                action: h('span', { style: { fontSize: 11, color: MUTED } }, String(group.skills.length)),
+              }, group.skills.map((skill) => h(Row, {
+                key: skill.name,
+                row: { title: skill.name, name: skill.name, description: skill.description || '' },
+                noSwitch: true,
+                switchHint: T.loadedSkill,
+              })))),
+              h('div', { style: { fontSize: 11, color: MUTED } }, T.scanNote),
+            ])
         : moreView
         ? h(Section, {
           title: T.experimental,
@@ -1327,21 +1728,6 @@ window.__ModuleLoader__.load({
       },
       h('p', { style: { margin: 0 } }, T.restartBody)) : null,
 
-      // right-click menu on a scene card
-      menu ? h('div', {
-        onMouseLeave: () => setMenu(null),
-        style: {
-          position: 'fixed', left: Math.max(8, menu.x), top: Math.min(menu.y, Math.max(8, ((typeof window !== 'undefined' && window.innerHeight) || 800) - 140)), zIndex: 60,
-          minWidth: 148, padding: 4, borderRadius: 10, background: SURFACE_2,
-          border: `.5px solid ${BORDER_STRONG}`, boxShadow: '0 8px 24px rgba(0,0,0,.28)',
-          display: 'flex', flexDirection: 'column',
-        },
-      },
-      h(MenuItem, { onClick: () => { const scene = menu.scene; setMenu(null); loadedSceneRef.current = scene.id; setSelectedId(scene.id); setDraft(sceneDraft(scene)); setMoreView(false); setStep('plugins') } }, T.ctxEdit),
-      h(MenuItem, { onClick: () => copyScene(menu.scene) }, T.ctxCopy),
-      h(MenuItem, { onClick: () => { setRenaming({ scene: menu.scene, value: menu.scene.name }); setMenu(null) } }, T.ctxRename),
-      h(MenuItem, { onClick: () => applyScene(menu.scene) }, T.ctxApply)) : null,
-
       // rename dialog
       renaming ? h(Modal, {
         title: T.renameTitle,
@@ -1363,7 +1749,66 @@ window.__ModuleLoader__.load({
           color: TEXT_1, background: 'transparent', border: `.5px solid ${BORDER_STRONG}`,
           borderRadius: 8, outline: 'none',
         },
-      })) : null)
+      })) : null,
+
+      // combo name dialog (save / update / duplicate)
+      comboForm ? h(Modal, {
+        title: comboForm.id ? T.comboUpdate : T.comboSave,
+        onClose: () => setComboForm(null),
+        footer: [
+          h(Button, { key: 'cancel', onClick: () => setComboForm(null), variant: 'ghost' }, T.cancel),
+          h(Button, { key: 'ok', onClick: submitCombo, variant: 'primary', disabled: busy }, T.save),
+        ],
+      },
+      h('input', {
+        value: comboForm.value,
+        placeholder: T.comboName,
+        'aria-label': T.comboName,
+        autoFocus: true,
+        onChange: (event) => setComboForm({ ...comboForm, value: event.target.value }),
+        onKeyDown: (event) => { if (event.key === 'Enter') submitCombo() },
+        style: {
+          width: '100%', height: 34, padding: '0 12px', font: 'inherit', fontSize: 13, boxSizing: 'border-box',
+          color: TEXT_1, background: 'transparent', border: `.5px solid ${BORDER_STRONG}`,
+          borderRadius: 8, outline: 'none',
+        },
+      }),
+      h('p', { style: { margin: '8px 0 0', fontSize: 12, color: MUTED } }, `${T.comboTitle} · ${skillOnNames.length}`)) : null,
+
+      noteForm ? h(Modal, {
+        title: noteForm.id ? T.noteEdit : T.noteNew,
+        onClose: () => setNoteForm(null),
+        footer: [
+          noteForm.id ? h(Button, { key: 'del', onClick: () => removeNote(noteForm.id), variant: 'danger' }, T.noteDelete) : null,
+          h(Button, { key: 'cancel', onClick: () => setNoteForm(null), variant: 'ghost' }, T.cancel),
+          h(Button, { key: 'ok', onClick: submitNote, variant: 'primary', disabled: busy }, T.save),
+        ],
+      },
+      h('input', {
+        value: noteForm.name,
+        placeholder: T.noteName,
+        'aria-label': T.noteName,
+        autoFocus: true,
+        onChange: (event) => setNoteForm({ ...noteForm, name: event.target.value }),
+        style: {
+          width: '100%', height: 34, padding: '0 12px', font: 'inherit', fontSize: 13, boxSizing: 'border-box',
+          color: TEXT_1, background: 'transparent', border: `.5px solid ${BORDER_STRONG}`,
+          borderRadius: 8, outline: 'none',
+        },
+      }),
+      h('textarea', {
+        value: noteForm.body,
+        placeholder: T.noteBody,
+        'aria-label': T.noteBody,
+        rows: 8,
+        onChange: (event) => setNoteForm({ ...noteForm, body: event.target.value }),
+        style: {
+          width: '100%', minHeight: 140, marginTop: 8, padding: '8px 12px', font: 'inherit', fontSize: 13,
+          boxSizing: 'border-box', color: TEXT_1, background: 'transparent', border: `.5px solid ${BORDER_STRONG}`,
+          borderRadius: 8, outline: 'none', resize: 'vertical', lineHeight: 1.5,
+        },
+      }),
+      h('p', { style: { margin: '8px 0 0', fontSize: 12, color: MUTED } }, T.notesHint)) : null)
     }
 
     /* ---- composer scene picker --------------------------------------------
