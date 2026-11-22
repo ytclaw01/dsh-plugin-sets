@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-sets",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "Save named scenes of DSH plugins, MCP servers, skills and scene notes, and switch between them in one click.",
   "license": "MIT",

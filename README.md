@@ -51,7 +51,7 @@ A DSH plugin that saves the official Plugins page state as named **scenes** — 
    ```sh
    dsh plugin add github:ytclaw01/dsh-plugin-sets
    ```
-   同一个包也发布在 npm（同名，当前 `0.2.0`），可用 `npm i dsh-plugin-sets` 获取源码或做版本校验；DSH 内的安装与启用仍建议用上面的 GitHub 地址
+   同一个包也发布在 npm（同名，当前 `0.2.1`），可用 `npm i dsh-plugin-sets` 获取源码或做版本校验；DSH 内的安装与启用仍建议用上面的 GitHub 地址
 3. **从源码**：`Settings → 插件 → 添加插件`，填本仓库地址；或本地目录用 `plugin_manager install_bundle`
 
 安装后到 **设置 → DSH场景设置**。
@@ -120,7 +120,7 @@ Applying a scene is a **diff**: only rows that differ from the live state are to
 dsh plugin add github:ytclaw01/dsh-plugin-sets
 ```
 
-The same package is also published to npm under the same name (currently `0.2.0`) for source access and version checks (`npm i dsh-plugin-sets`); installing inside DSH is still best done from the GitHub address above.
+The same package is also published to npm under the same name (currently `0.2.1`) for source access and version checks (`npm i dsh-plugin-sets`); installing inside DSH is still best done from the GitHub address above.
 
 Alternatively install it from the plugin market, or point `Settings → Plugins → Add plugin` at this repository. Then open `Settings → DSH scene settings`.
 
