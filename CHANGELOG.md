@@ -28,7 +28,7 @@
 
 - 技能掩码依赖本插件 host 半常驻：插件崩溃时掩码失效，被停用的技能会重新可用（fail-open）。
 - 与其它技能管理插件（如 `@michengai/dsh-skills-manager`）共存时，两边都能改同一批技能；本插件用 `rank: 0` 优先。
-- 设置页仅在 web UI（`dsh.client.platform: web`）。
+- 设置页是浏览器端渲染的客户端模块（`dsh.client.platform: web`）：桌面版与 Web 版都有，纯 CLI / headless 运行时没有。
 
 ## 0.1.0 — 2026-11-18
 

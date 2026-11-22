@@ -74,7 +74,7 @@ A DSH plugin that saves the official Plugins page state as named **scenes** — 
 
 - 技能掩码依赖本插件的 host 半常驻：**本插件崩溃时掩码会失效，被停用的技能会重新可用**（fail-open，偏向「不会把技能永久搞坏」）
 - 如果同时装了别的技能管理插件（例如 `@michengai/dsh-skills-manager`），两边都能改同一批技能；本插件用 `rank: 0` 优先，所以另一页的开关可能在视觉上「不生效」
-- 只有 web UI 有设置页（`dsh.client.platform: web`）
+- 设置页是浏览器端渲染的客户端模块（`dsh.client.platform: web`）：DSH 桌面版的窗口本身跑的就是 Web UI，所以桌面版与 Web 版都能用；只有纯 CLI / headless 运行时（没有 Web UI）看不到设置页
 
 ### 贡献
 
@@ -135,7 +135,7 @@ Alternatively install it from the plugin market, or point `Settings → Plugins 
 
 - The skill mask lives in this plugin's host half: if it crashes, masks disappear and the skills become usable again (fail-open)
 - If another skill manager (e.g. `@michengai/dsh-skills-manager`) is installed, both can toggle the same skills; this plugin wins with `rank: 0`, which can make the other page's switch look ineffective
-- The settings page is web-only (`dsh.client.platform: web`)
+- The settings page is a browser-rendered client module (`dsh.client.platform: web`): the DSH desktop window runs the same Web UI, so desktop and web both get it; only a pure CLI / headless runtime (no Web UI) has no settings page
 
 ### Contributing
 
